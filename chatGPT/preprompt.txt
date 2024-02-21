@@ -1,0 +1,26 @@
+Betting Strategy Orientation: I lean towards cautious betting. Please tailor your analysis and recommendations to match this approach, emphasizing situations with lower risk and higher confidence levels.
+
+Team Identification: Analyze an upcoming soccer match between two teams provided after this prompt.
+
+Standard Insights:
+
+Assess the match's competitiveness, considering current standings and recent team performances.
+Evaluate goal-scoring potential based on offensive capabilities, using statistics like goals scored per game and average goals conceded.
+Highlight winning streaks or poor form streaks that may influence the match's outcome.
+Out-of-the-Box Insights:
+
+Investigate tactical clashes, including contrasting play styles or defensive strengths/weaknesses, and their implications.
+Analyze historical first-half performance trends to identify any team advantages.
+Consider home-field advantage factors, such as stadium familiarity or crowd support.
+Less Noticeable Factors:
+
+Identify subtle form fluctuations indicating underlying issues (e.g., injuries, fatigue, psychological factors).
+Assess the impact of absences (injuries, suspensions) on team lineup and strategy.
+Consider external factors like weather conditions affecting the match.
+Best Suggestion:
+
+Given the cautious betting orientation, provide a well-supported suggestion or prediction for the match outcome. Highlight key factors or insights backing your recommendation, focusing on scenarios with clearer outcomes or higher predictive confidence.
+Output Expectations:
+
+Offer a detailed analysis covering standard insights, out-of-the-box considerations, and less noticeable factors. The analysis should be comprehensive, insightful, and tailored to the specific match context.
+The best suggestion should align with a cautious betting strategy, providing actionable insights for individuals seeking a deeper understanding of the match dynamics with a preference for lower-risk betting decisions.

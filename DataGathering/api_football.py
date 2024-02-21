@@ -8,16 +8,12 @@ logging.basicConfig(level=logging.INFO)
 
 api_key = os.getenv("RAPID_API_KEY")
 
-## For instance, here is the input we get : Guadalajara Chivas at Necaxa (SOCCER, Mexico Primera Division)
-## To get the H2H history, we need the two team ids
-
-
-def getH2H(team1: str, team2: str):
+def getH2H(team1Id: str, team2Id: str):
     res = requests.get(
         "https://api-football-v1.p.rapidapi.com/v3/fixtures/headtohead?h2h="
-        + team1
+        + team1Id
         + "-"
-        + team2,
+        + team2Id,
         headers={"x-rapidapi-key": api_key},
     )
     data = res.json()["response"]
@@ -65,7 +61,6 @@ def getTeamId(teamName):
     if res.status_code != 200:
         logging.error("Error in getTeamId", str(res.json()))
         return
-
 
     try:
         data = res.json()["response"]
@@ -119,18 +114,18 @@ def getTeamStats(teamId, leagueId, season):
         print(key)
         print(res[key])
     """
-    
-    data["form"] = res["form"]
-    data['matchs'] = res["fixtures"]
-    data['goals'] = res["goals"]
-    return data
 
+    data["form"] = res["form"]
+    data["matchs"] = res["fixtures"]
+    data["goals"] = res["goals"]
+    return data
 
 
 def exploreTeamStats():
     with open("teamStats.json", "r") as f:
         data = json.load(f)
-    
+
+
 def main(team1Name, team2Name, leagueName):
     team1Id = getTeamId(team1Name)
     team2Id = getTeamId(team2Name)
@@ -141,6 +136,16 @@ def main(team1Name, team2Name, leagueName):
     return h2h, team1Stats, team2Stats
 
 
-if __name__ == "__main__":
-    print(main("Guadalajara Chivas", "Necaxa", "Liga MX"))
+def prettyPrintStats(stats):
+    res = ""
+    res += "Matchs History : " + stats["form"] + "\n"
+    print(stats.keys())
+    ## Match part :
+    print(stats["matchs"])
+    for match in stats["matchs"].keys():
+       print(stats["matchs"][match])
+    print(res)
 
+
+if __name__ == "__main__":
+    main("Auxerre", "Marseille", "Ligue 1")
