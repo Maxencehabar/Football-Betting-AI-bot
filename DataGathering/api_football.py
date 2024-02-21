@@ -6,6 +6,7 @@ import json
 
 logging.basicConfig(level=logging.INFO)
 
+load_dotenv()
 api_key = os.getenv("RAPID_API_KEY")
 
 def getH2H(team1Id: str, team2Id: str):

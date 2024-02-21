@@ -2,6 +2,8 @@ from langchain.llms import OpenAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 with open("chatGPT/preprompt.txt", "r") as f:
     preprompt = f.read()

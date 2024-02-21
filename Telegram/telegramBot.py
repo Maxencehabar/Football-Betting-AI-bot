@@ -1,6 +1,7 @@
 import telebot
 import os
 import sys
+from dotenv import load_dotenv
 sys.path.append("chatGPT/")
 import analyseData as chatGPT
 
@@ -10,7 +11,7 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-
+load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 bot = telebot.TeleBot(BOT_TOKEN)
 
