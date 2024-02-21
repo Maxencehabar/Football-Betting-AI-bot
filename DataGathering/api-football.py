@@ -26,7 +26,7 @@ def getH2H(team1: str, team2: str):
         json.dump(data, f)
 
 
-def exploreData():
+def exploreFixtures():
     with open("h2h.json", "r") as f:
         data = json.load(f)
     print(len(data))
@@ -39,6 +39,10 @@ def exploreData():
         team2 = match["teams"]["away"]["name"]
         score = str(match["goals"]["home"]) + " - " + str(match["goals"]["away"])
         print(date, ":", team1, score, team2)
+
+
+def getTeamStats(teamId):
+    pass
 
 
 def getFixtureStats(fixtureId):
@@ -70,6 +74,9 @@ def getTeamId(teamName):
     if res.status_code != 200:
         logging.error("Error in getTeamId", str(res.json()))
         return
+    with open("team.json", "w") as f:
+        json.dump(res.json(), f)
+
     try:
         data = res.json()["response"]
         team = data[0]
@@ -80,20 +87,65 @@ def getTeamId(teamName):
         return
 
 
-def getData(input):
-
+def getLeagueId(leagueName):
+    params = {"name": leagueName}
     res = requests.get(
-        "https://api-football-v1.p.rapidapi.com/v3/countries",
+        "https://api-football-v1.p.rapidapi.com/v3/leagues",
+        headers={"x-rapidapi-key": api_key},
+        params=params,
+    )
+    if res.status_code != 200:
+        logging.error("Error in getLeagueId", str(res.json()))
+        return
+    with open("league.json", "w") as f:
+        json.dump(res.json(), f)
+    try:
+        data = res.json()["response"]
+        league = data[0]
+        leagueId = league["league"]["id"]
+        return leagueId
+    except:
+        logging.error("Error in getLeagueId", str(res.json()))
+        return
+
+
+def getTeamStats(teamId, leagueId, season):
+    res = requests.get(
+        "https://api-football-v1.p.rapidapi.com/v3/teams/statistics?season="
+        + season
+        + "&team="
+        + teamId
+        + "&league="
+        + leagueId,
         headers={"x-rapidapi-key": api_key},
     )
-    print(res.json())
+    if res.status_code != 200:
+        logging.error("Error in getTeamStats", str(res.json()))
+        return
+    with open("teamStats.json", "w") as f:
+        json.dump(res.json(), f)
+    data = res.json()["response"]
+    print(data)
+
+
+def exploreTeamStats():
+    with open("teamStats.json", "r") as f:
+        data = json.load(f)
+    res = data["response"]
+    ##print(res)
+    data = dict()
+    data["form"] = res["form"]
+    fixtures = res["fixtures"]
+    print(fixtures.keys())
 
 
 if __name__ == "__main__":
-    """id1 = getTeamId("Guadalajara Chivas")
+    """leagueId = getLeagueId("Liga MX")
+    id1 = getTeamId("Guadalajara Chivas")
+    getTeamStats(str(id1), str(leagueId), "2021")
     id2 = getTeamId("Necaxa")
-    print(id1, id2)"""
+    print(id1, id2)
     id1 = 2278
     id2 = 2288
-    ##getH2H(str(id1), str(id2))
-    exploreData()
+    ##getH2H(str(id1), str(id2))"""
+    exploreTeamStats()
