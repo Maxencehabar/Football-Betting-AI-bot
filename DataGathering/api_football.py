@@ -9,6 +9,34 @@ logging.basicConfig(level=logging.INFO)
 load_dotenv()
 api_key = os.getenv("RAPID_API_KEY")
 
+
+def getCountries():
+    res = requests.get(
+        "https://api-football-v1.p.rapidapi.com/v3/countries",
+        headers={"x-rapidapi-key": api_key},
+    )
+    data = res.json()["response"]
+    print(data)
+    with open("countriesList.json", "w") as f:
+        json.dump(data, f)
+    for country in data:
+        print(country["name"])
+    return data
+
+
+def getLeagues():
+    res = requests.get(
+        "https://api-football-v1.p.rapidapi.com/v3/leagues",
+        headers={"x-rapidapi-key": api_key},
+    )
+    data = res.json()["response"]
+    with open("leaguesList.json", "w") as f:
+        json.dump(data, f)
+    for league in data:
+        print(league["league"])
+    return data
+
+
 def getH2H(team1Id: str, team2Id: str):
     res = requests.get(
         "https://api-football-v1.p.rapidapi.com/v3/fixtures/headtohead?h2h="
@@ -144,9 +172,9 @@ def prettyPrintStats(stats):
     ## Match part :
     print(stats["matchs"])
     for match in stats["matchs"].keys():
-       print(stats["matchs"][match])
+        print(stats["matchs"][match])
     print(res)
 
 
 if __name__ == "__main__":
-    main("Auxerre", "Marseille", "Ligue 1")
+    getCountries()
