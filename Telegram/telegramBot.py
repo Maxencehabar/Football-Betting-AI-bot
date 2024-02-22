@@ -4,20 +4,22 @@ import sys
 from dotenv import load_dotenv
 sys.path.append("chatGPT/")
 import analyseData as chatGPT
-
 sys.path.append("DataGathering/")
 import api_football as api
-
 sys.path.append("DataGathering/getAvailable/")
 import getCountries as getCountries
 
-import logging
 
+import logging
 logging.basicConfig(level=logging.INFO)
 
+
 load_dotenv()
+#BOT_TOKEN = os.getenv("TESTING_TELEGRAM_BOT")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 bot = telebot.TeleBot(BOT_TOKEN)
+
+
 
 @bot.message_handler(commands=["countries"])
 def send_countries(message):
@@ -26,6 +28,8 @@ def send_countries(message):
     for country in countries:
         res += country+ "\n"
     bot.send_message(message.chat.id, "Available countries : \n" + res)
+
+
 
 @bot.message_handler(commands=["leagues"])
 def send_leagues(message):
@@ -40,9 +44,25 @@ def send_leagues(message):
         logging.error(e)
         bot.send_message(message.chat.id, "Please provide the country like so : /leagues country")
 
+@bot.message_handler(commands=["teams"])
+def send_teams(message):
+    try:
+        data = message.text.replace("/teams ", "")
+        print(data)
+        league = data.split("-")[0]
+        season = data.split("-")[1]
+        teams = api.getTeams(league, season, bot, message)
+        res = ""
+        for team in teams:
+            res += team + "\n"
+        bot.send_message(message.chat.id, "Available teams in " + league + " : \n" + res)
+    except Exception as e:
+        logging.error(e)
+        bot.send_message(message.chat.id, "Please provide the league like so : /teams league-season")
+
 
 @bot.message_handler(commands=["game"])
-def send_welcome(message):
+def game(message):
     try:
         logging.info("Received a /game command.")
         messageContent = message.text
@@ -69,7 +89,7 @@ def send_welcome(message):
             return
         logging.info("Team1: " + team1 + " Team2: " + team2 + " League: " + league)
         ## Data processing and analysis.
-        res = api.main(team1, team2,league)
+        res = api.main(team1, team2,league, bot, message)
         h2h, tea1Stats, team2Stats = res
         ## Shaping the h2h list : 
         res = ""
@@ -91,8 +111,18 @@ def send_welcome(message):
 
 @bot.message_handler()
 def sendHelp(message):
-    helpMessage = "Welcome to the Football Bot! Here are the commands you can use:\n/game - Start the analysis for a match.\nPlease provide info like so : /game team1-team2-league \n/countries - Get the list of available countries.\n/leagues - Get the list of available leagues in a country.\nPlease provide the country like so : /leagues country\n/help - Get help."
+    helpMessage = """Welcome to the Football Bot! Here are the commands you can use:\n
+    - /game - Start the analysis for a match.\n
+    Please provide info like so : /game team1-team2-league \n
+    - /countries - Get the list of available countries.\n
+    - /leagues - Get the list of available leagues in a country.\n
+    Please provide the country like so : /leagues country\n
+    - /teams - Get the list of available teams in a league.\n
+    Please provide the league like so : /teams league-season\n
+    - /help - Get help."""
     bot.send_message(message.chat.id, helpMessage)
+
+
 
 if __name__ == "__main__":
     logging.info("Starting the bot...")

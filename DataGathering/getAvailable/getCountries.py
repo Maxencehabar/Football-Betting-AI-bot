@@ -1,5 +1,9 @@
 import json
-
+import requests
+import os
+from dotenv import load_dotenv
+load_dotenv()
+api_key = os.getenv("RAPID_API_KEY")
 
 def getCountriesList():
     with open("DataGathering/getAvailable/countriesList.json", "r") as f:
@@ -21,5 +25,7 @@ def getLeaguesList(country):
     return names
 
 
+
+
 if __name__ == "__main__":
-    getLeaguesList("France")
+    pass

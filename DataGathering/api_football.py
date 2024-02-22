@@ -37,6 +37,26 @@ def getLeagues():
     return data
 
 
+def getTeams(leagueName, season, bot=None, message=None):
+    leagueId = getLeagueId(leagueName)
+    if leagueId is None:
+        bot.send_message(message.chat.id, "League not found.")
+    res = requests.get(
+        "https://api-football-v1.p.rapidapi.com/v3/teams",
+        headers={"x-rapidapi-key": api_key},
+        params={"league": leagueId, "season": season},
+    )
+    print(res.json())
+    if res.json()['results'] == 0:
+        bot.send_message(message.chat.id, "No teams found.")
+        return
+    data = res.json()["response"]
+    teamsName = []
+    for team in data:
+        teamsName.append(team["team"]["name"])
+    return teamsName
+
+
 def getH2H(team1Id: str, team2Id: str):
     res = requests.get(
         "https://api-football-v1.p.rapidapi.com/v3/fixtures/headtohead?h2h="
@@ -70,15 +90,6 @@ def getFixtureStats(fixtureId):
     print(data)
 
 
-def getLeague(leagueName):
-    res = requests.get(
-        "https://api-football-v1.p.rapidapi.com/v3/leagues",
-        headers={"x-rapidapi-key": api_key},
-    )
-    data = res.json()["response"]
-    print(type(data))
-
-
 def getTeamId(teamName):
     logging.info("Getting team id for " + teamName)
     params = {"name": teamName}
@@ -88,17 +99,17 @@ def getTeamId(teamName):
         params=params,
     )
     if res.status_code != 200:
-        logging.error("Error in getTeamId", str(res.json()))
+        logging.error("GetTeamId : Status code != 200", str(res.json()))
         return
 
-    try:
-        data = res.json()["response"]
-        team = data[0]
-        teamId = team["team"]["id"]
-        return teamId
-    except:
-        logging.error("Error in getTeamId", str(res.json()))
-        return
+    ##print(res.json())
+    if res.json()["results"] == 0:
+        logging.error("GetTeamId : No team found.")
+        return None
+    data = res.json()["response"]
+    team = data[0]
+    teamId = team["team"]["id"]
+    return teamId
 
 
 def getLeagueId(leagueName):
@@ -111,16 +122,14 @@ def getLeagueId(leagueName):
     if res.status_code != 200:
         logging.error("Error in getLeagueId", str(res.json()))
         return
-    with open("league.json", "w") as f:
-        json.dump(res.json(), f)
-    try:
-        data = res.json()["response"]
-        league = data[0]
-        leagueId = league["league"]["id"]
-        return leagueId
-    except:
-        logging.error("Error in getLeagueId", str(res.json()))
-        return
+    ##print(res.json())
+    if res.json()["results"] == 0:
+        logging.error("No league found.")
+        return None
+    data = res.json()["response"]
+    league = data[0]
+    leagueId = league["league"]["id"]
+    return leagueId
 
 
 def getTeamStats(teamId, leagueId, season):
@@ -155,11 +164,25 @@ def exploreTeamStats():
         data = json.load(f)
 
 
-def main(team1Name, team2Name, leagueName):
+def main(team1Name, team2Name, leagueName, bot, message):
     team1Id = getTeamId(team1Name)
+    if team1Id is None:
+        bot.send_message(message.chat.id, "Team1 not found.")
+        return
     team2Id = getTeamId(team2Name)
+    if team2Id is None:
+        bot.send_message(message.chat.id, "Team2 not found.")
+        return
     leagueId = getLeagueId(leagueName)
-    h2h = getH2H(str(team1Id), str(team2Id))
+    if leagueId is None:
+        bot.send_message(message.chat.id, "League not found.")
+        return
+    try:
+        h2h = getH2H(str(team1Id), str(team2Id))
+    except Exception as e:
+        logging.error(e)
+        bot.send_message(message.chat.id, "Error in getting h2h.")
+        return
     team1Stats = getTeamStats(str(team1Id), str(leagueId), "2021")
     team2Stats = getTeamStats(str(team2Id), str(leagueId), "2021")
     return h2h, team1Stats, team2Stats
@@ -177,4 +200,6 @@ def prettyPrintStats(stats):
 
 
 if __name__ == "__main__":
-    getCountries()
+    # leagueId = getLeagueId("europa league")
+    leagueId = getLeagueId("UEFA Europa League")
+    getTeams("UEFA Europa League", "2023")
