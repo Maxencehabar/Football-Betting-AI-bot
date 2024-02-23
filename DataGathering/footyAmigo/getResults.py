@@ -101,7 +101,7 @@ def exploreResults(data: dict = None):
 def getMatchStr(matchList):
     res = ""
     for match in matchList:
-        res += match["date"] + " : (" + match["home_name"] + ") " + match["score"] + " (" + match["away_name"] + ") HT : " + str(match["ht_score"] )+ "\n"
+        res += str(match["date"]) + " : (" + str(match["home_name"]) + ") " + str(match["score"]) + " (" + str(match["away_name"]) + ") HT : " + str(match["ht_score"] )+ "\n"
     return res
     
 
