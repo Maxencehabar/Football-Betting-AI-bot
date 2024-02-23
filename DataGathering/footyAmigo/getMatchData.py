@@ -38,6 +38,15 @@ def getMatchData(matchId):
     return data
 
 
+def extractGeneral(data):
+    result = {}
+    result["away_position"] = data["away_position"]
+    result["home_position"] = data["home_position"]
+    return result
+
+def extractStats(data):
+    generalData = extractGeneral(data)
+
 def extractData(data):
     result = {}
     result["probability"] = data["probability"]
@@ -50,6 +59,25 @@ def extractData(data):
     return result
 
 
+def getProbaStr(data):
+    res = ""
+    res += "Home win : " + str(data["probability"]["home_win_probability"]) + "%\n"
+    res += "Draw : " + str(data["probability"]["draw_probability"]) + "\n"
+    res += "Away win : " + str(data["probability"]["away_win_probability"]) + "%\n"  
+    res += "BTTS : " + str(data["probability"]["btts_probability"]) + "\n"
+    res += "Over 2.5 : " + str(data["probability"]["o25_goals_probability"]) + "%\n"
+    res += "Over 3.5 : " + str(data["probability"]["o35_goals_probability"]) + "%\n"
+    res += "Under 2.5 : " + str(data["probability"]["u25_goals_probability"]) + "%\n"
+    res += "Under 3.5 : " + str(data["probability"]["u35_goals_probability"]) + "%\n"
+    res += "+0.5 Home Goals : " + str(data["probability"]["o05_home_goals_probability"]) + "%\n"
+    res += "+0.5 Away Goals : " + str(data["probability"]["o05_away_goals_probability"]) + "%\n"
+    res += "+1.5 Home Goals : " + str(data["probability"]["o15_home_goals_probability"]) + "%\n"
+    res += "+1.5 Away Goals : " + str(data["probability"]["o15_away_goals_probability"]) + "%\n"
+    return res 
+
+
+
+
 def exploreMatchData():
     with open("DataGathering/footyAmigo/matchData.json", "r") as f:
         data = json.load(f)
@@ -58,6 +86,7 @@ def exploreMatchData():
 
 
 if __name__ == "__main__":
-    id = "19050408"
+    id = "18860667"
     data = getMatchData(id)
-    print(extractData(data))
+    ##print(extractData(data))
+    getProbaStr(data)

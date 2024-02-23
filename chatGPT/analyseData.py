@@ -24,7 +24,7 @@ llm_chain = LLMChain(
 
 
 def Analyse(match, stats):
-    res = llm_chain.predict(match=match, stats=stats, max_tokens=1000).strip()
+    res = llm_chain.predict(match=match, stats=stats)
     print(res)
     return res
 
