@@ -5,7 +5,9 @@ import time
 from dotenv import load_dotenv
 sys.path.append("chatGPT/")
 
-import analyseData as chatGPT
+
+#import analyseData as chatGPT
+import newChatGPT as chatGPT
 sys.path.append("DataGathering/footyAmigo/")
 import getMatchData as getMatchData
 import getResults as getResults
@@ -18,8 +20,8 @@ logging.basicConfig(level=logging.INFO)
 
 
 load_dotenv()
-BOT_TOKEN = os.getenv("TESTING_TELEGRAM_BOT")
-#BOT_TOKEN = os.getenv("BOT_TOKEN")
+#BOT_TOKEN = os.getenv("TESTING_TELEGRAM_BOT")
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 bot = telebot.TeleBot(BOT_TOKEN)
 
 
@@ -69,8 +71,8 @@ def game(message):
     bot.send_message(message.chat.id, stringMatch)
 
     match = data["home_name"] + " vs " + data["away_name"]
-    res = chatGPT.Analyse(match=match, stats=stringToChatGPT)
     bot.send_message(message.chat.id, "ChatGPT Analysis :")
+    res = chatGPT.Analyse(match=match, stats=stringToChatGPT)
     bot.send_message(message.chat.id, res)
 
     
