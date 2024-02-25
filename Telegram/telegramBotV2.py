@@ -3,27 +3,28 @@ import os
 import sys
 import time
 from dotenv import load_dotenv
+
 sys.path.append("chatGPT/")
 
 
-#import analyseData as chatGPT
+# import analyseData as chatGPT
 import newChatGPT as chatGPT
+
 sys.path.append("DataGathering/footyAmigo/")
 import getMatchData as getMatchData
 import getResults as getResults
 import searchForMatchs as searchForMatchs
 
 
-
 import logging
+
 logging.basicConfig(level=logging.INFO)
 
 
 load_dotenv()
-#BOT_TOKEN = os.getenv("TESTING_TELEGRAM_BOT")
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+BOT_TOKEN = os.getenv("TESTING_TELEGRAM_BOT")
+# BOT_TOKEN = os.getenv("BOT_TOKEN")
 bot = telebot.TeleBot(BOT_TOKEN)
-
 
 
 @bot.message_handler(commands=["game"])
@@ -31,7 +32,10 @@ def game(message):
     text = message.text.replace("/game ", "")
     words = text.split("-")
     if words == None or words == []:
-        bot.send_message(message.chat.id, "Please provide the teams and the league like so : /game team1-team2")
+        bot.send_message(
+            message.chat.id,
+            "Please provide the teams and the league like so : /game team1-team2",
+        )
         return
     id = searchForMatchs.searchForMatchs(words, bot, message)
     if id == None:
@@ -45,7 +49,6 @@ def game(message):
     bot.send_message(message.chat.id, "Probabilities :")
     time.sleep(0.5)
     bot.send_message(message.chat.id, str(probaStr))
-
 
     stringToChatGPT += "\nMatch history : \n"
     h2h, home, away = getResults.getResults(id)
@@ -70,12 +73,21 @@ def game(message):
     time.sleep(0.5)
     bot.send_message(message.chat.id, stringMatch)
 
+    ## getting the stats
+
+    stats = getMatchData.extractStats(data)
+    stringToChatGPT += "Stats : \n"
+    stringStats = getMatchData.getStatsStr(stats)
+    stringToChatGPT += stringStats
+    bot.send_message(message.chat.id, "Stats :")
+    time.sleep(0.5)
+    bot.send_message(message.chat.id, stringStats)
+
     match = data["home_name"] + " vs " + data["away_name"]
     bot.send_message(message.chat.id, "ChatGPT Analysis :")
-    res = chatGPT.Analyse(match=match, stats=stringToChatGPT)
-    bot.send_message(message.chat.id, res)
+    ##res = chatGPT.Analyse(match=match, stats=stringToChatGPT)
+    ##bot.send_message(message.chat.id, res)
 
-    
 
 @bot.message_handler()
 def sendHelp(message):
@@ -83,7 +95,6 @@ def sendHelp(message):
     /game : Get the probability of a match result.
     please provide the teams and the league like so : /game team1-team2"""
     bot.send_message(message.chat.id, helpMessage)
-
 
 
 if __name__ == "__main__":

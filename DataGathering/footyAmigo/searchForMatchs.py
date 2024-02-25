@@ -19,7 +19,7 @@ headers = {
 }
 
 
-def searchForMatchs(words, bot, message):
+def searchForMatchs(words, bot=None, message=None):
     """
     This function takes a list of words and returns the id of the first match found.
     """
@@ -39,7 +39,7 @@ def searchForMatchs(words, bot, message):
     if response.json()["found"] == 0:
         print("No match found.")
         return
-    print(response.json())
+    ##print(response.json())
     data = response.json()["hits"]
     for match in data:
         id = match["document"]["id"]
@@ -50,11 +50,20 @@ def searchForMatchs(words, bot, message):
         date = datetime.fromtimestamp(timestamp)
         print(date)
         if status == "NS":
-
-            bot.send_message(message.chat.id, "Found the match : " + match["document"]["home_name"] + " vs " + match["document"]["away_name"] + " in " + match["document"]["league_name"])
-            bot.send_message(message.chat.id, "Happenning at : " + str(date))
+            if bot and message:
+                bot.send_message(
+                    message.chat.id,
+                    "Found the match : "
+                    + match["document"]["home_name"]
+                    + " vs "
+                    + match["document"]["away_name"]
+                    + " in "
+                    + match["document"]["league_name"],
+                )
+                bot.send_message(message.chat.id, "Happenning at : " + str(date))
+            print("Found the match : ", id)
             return id
 
 
 if __name__ == "__main__":
-    searchForMatchs(["toulouse", "benefica"])
+    searchForMatchs(["Zacapa Tellioz"])
