@@ -45,6 +45,8 @@ def searchForMatchs(words, bot=None, message=None):
         id = match["document"]["id"]
         status = match["document"]["status"]
         timestamp = match["document"]["timestamp"]
+        pays = match["document"]["country_name"]
+        print(pays)
         ## convert the timestamp to a human readable format.
         ## timestamp is 1708610400
         date = datetime.fromtimestamp(timestamp)
@@ -62,7 +64,7 @@ def searchForMatchs(words, bot=None, message=None):
                 )
                 bot.send_message(message.chat.id, "Happenning at : " + str(date))
             print("Found the match : ", id)
-            return id
+            return (id, match["document"]["home_name"], match["document"]["away_name"], match["document"]["league_name"], date)
 
 
 if __name__ == "__main__":

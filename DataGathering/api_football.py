@@ -2,6 +2,10 @@ import requests
 import os
 from dotenv import load_dotenv
 import logging
+import sys
+
+sys.path.append("../chatGPT/")
+import getPays as getPays
 import json
 
 logging.basicConfig(level=logging.INFO)
@@ -24,10 +28,11 @@ def getCountries():
     return data
 
 
-def getLeagues():
+def getLeagues(pays=None):
     res = requests.get(
         "https://api-football-v1.p.rapidapi.com/v3/leagues",
         headers={"x-rapidapi-key": api_key},
+        params={"country": pays},
     )
     data = res.json()["response"]
     with open("leaguesList.json", "w") as f:
@@ -47,7 +52,7 @@ def getTeams(leagueName, season, bot=None, message=None):
         params={"league": leagueId, "season": season},
     )
     print(res.json())
-    if res.json()['results'] == 0:
+    if res.json()["results"] == 0:
         bot.send_message(message.chat.id, "No teams found.")
         return
     data = res.json()["response"]
@@ -199,7 +204,70 @@ def prettyPrintStats(stats):
     print(res)
 
 
+def getLineups(fixtureId):
+    res = requests.get(
+        "https://api-football-v1.p.rapidapi.com/v3/fixtures/lineups?fixture="
+        + fixtureId,
+        headers={"x-rapidapi-key": api_key},
+    )
+    data = res.json()["response"]
+    print(data)
+    return data
+
+
+def getLeagueSeason(leagueId):
+    pass
+
+
+def getFixtureId(leagueId, season, date):
+    res = requests.get(
+        "https://api-football-v1.p.rapidapi.com/v3/fixtures",
+        headers={"x-rapidapi-key": api_key},
+        params={"league": leagueId, "season": season, "date": "2023-03-01"},
+    )
+    if res.status_code != 200:
+        print("Error in getFixtureId", res.json())
+    print(res.json())
+    data = res.json()["response"]
+    if len(data) == 0:
+        print("No match found.")
+        return  
+    print(data)
+    print(data[0])
+    return data
+
+
+def getLineups():
+    ## get fixture id from league name, team name
+    ##18893355 Cholet Dijon National France 2024-03-01 19:30:00
+    res = getLeagues("France")
+
+    leagues = []
+    leaguesNames = []
+    for league in res:
+        actualSeason = ""
+        print(league["seasons"])
+        for season in league["seasons"]:
+            if season["current"] == True:
+                actualSeason = season["year"]
+        leagues.append((league["league"]["name"], actualSeason))
+        leaguesNames.append(league["league"]["name"])
+
+    leagueId = getLeagueId("National")
+    if leagueId is None:
+        print("League not found. Asking chatGPT")
+        res = getPays.getLeague(leaguesNames, "National")
+        if "None" in res:
+            print("League not found")
+        else:
+            leagueId = getLeagueId(res)
+            print("League found : ", leagueId)
+            fixtureId = getFixtureId(leagueId, "2023", "2024-03-01")
+            print("Fixture id : ", fixtureId)
+    print(leagueId)
+
+
 if __name__ == "__main__":
-    # leagueId = getLeagueId("europa league")
-    leagueId = getLeagueId("UEFA Europa League")
-    getTeams("UEFA Europa League", "2023")
+    ##res = getLeagues("France")
+
+    getFixtureId("63", "2023", "2024-03-01")

@@ -15,6 +15,9 @@ import getMatchData as getMatchData
 import getResults as getResults
 import searchForMatchs as searchForMatchs
 
+sys.path.append("DataGathering/footyStats/")
+import getMatchLineups as getMatchLineups
+import searchFootyStats as searchFootyStats
 
 import logging
 
@@ -23,7 +26,7 @@ logging.basicConfig(level=logging.INFO)
 
 load_dotenv()
 BOT_TOKEN = os.getenv("TESTING_TELEGRAM_BOT")
-# BOT_TOKEN = os.getenv("BOT_TOKEN")
+#BOT_TOKEN = os.getenv("BOT_TOKEN")
 bot = telebot.TeleBot(BOT_TOKEN)
 
 
@@ -37,7 +40,8 @@ def game(message):
             "Please provide the teams and the league like so : /game team1-team2",
         )
         return
-    id = searchForMatchs.searchForMatchs(words, bot, message)
+    (id, home_name, away_name, leagueName, date) = searchForMatchs.searchForMatchs(words, bot, message)
+    print(id, home_name, away_name, leagueName,  date)
     if id == None:
         bot.send_message(message.chat.id, "No match found.")
         return
@@ -82,6 +86,25 @@ def game(message):
     bot.send_message(message.chat.id, "Stats :")
     time.sleep(0.5)
     bot.send_message(message.chat.id, stringStats)
+
+    ## getting the lineups
+    results = searchFootyStats.searchForMatchs(home_name)
+    
+    if len(results) == 0:
+        bot.send_message(message.chat.id, "Couldn't get lineups.")
+    else:
+        res = results[0]
+        print(res)
+        url = res[1]
+        lineups = getMatchLineups.getLineups(url)
+
+        stringToChatGPT += "Lineups : \n"
+        stringToChatGPT += str(lineups)
+        bot.send_message(message.chat.id, "Lineups :")
+        time.sleep(0.5)
+        for team in lineups:
+            bot.send_message(message.chat.id, str(team))
+            time.sleep(0.5)
 
     match = data["home_name"] + " vs " + data["away_name"]
     bot.send_message(message.chat.id, "ChatGPT Analysis :")
