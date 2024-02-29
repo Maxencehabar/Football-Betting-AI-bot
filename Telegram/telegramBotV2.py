@@ -97,15 +97,17 @@ def game(message):
         print(res)
         url = res[1]
         lineups = getMatchLineups.getLineups(url)
-
-        stringToChatGPT += "Lineups : \n"
-        stringToChatGPT += str(lineups)
-        bot.send_message(message.chat.id, "Lineups :")
-        time.sleep(0.5)
-        for team in lineups:
-            bot.send_message(message.chat.id, str(team))
+        if lineups == False:
+            bot.send_message(message.chat.id, "Couldn't get lineups.")
+        else:
+            stringToChatGPT += "Lineups : \n"
+            stringToChatGPT += str(lineups)
+            bot.send_message(message.chat.id, "Lineups :")
             time.sleep(0.5)
-
+            for team in lineups:
+                bot.send_message(message.chat.id, str(team))
+                time.sleep(0.5)
+    
     match = data["home_name"] + " vs " + data["away_name"]
     bot.send_message(message.chat.id, "ChatGPT Analysis :")
     ##res = chatGPT.Analyse(match=match, stats=stringToChatGPT)
